@@ -1,0 +1,74 @@
+plugins {
+  id "java"
+  id "maven-publish"
+  id "com.jfrog.bintray" version "1.8.4"
+}
+
+group = project_group
+version = project_version
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+  maven {
+    url "http://maven.aliyun.com/nexus/content/groups/public"
+  }
+}
+
+dependencies {
+  def lombokVersion = "1.18.2"
+  implementation "org.slf4j:slf4j-api:1.7.26"
+  testImplementation "io.vavr:vavr:0.10.0"
+  testImplementation "com.google.guava:guava:27.0-jre"
+  testImplementation "org.projectlombok:lombok:$lombokVersion"
+  testImplementation "junit:junit:4.12"
+  testImplementation "org.assertj:assertj-core:3.8.0"
+  annotationProcessor("org.projectlombok:lombok:$lombokVersion")
+  testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
+}
+
+task createDirs {
+  sourceSets*.java.srcDirs*.each { it.mkdirs() }
+  sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+}
+
+jar {
+  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+//  manifest {
+//    attributes 'Main-Class': ''
+//  }
+}
+
+task srcJar(type: Jar) {
+  archiveClassifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task docJar(type: Jar, dependsOn: srcJar) {
+  archiveClassifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+}
+
+artifacts {
+  archives srcJar
+  archives docJar
+}
+
+bintray {
+  user = project.hasProperty('bintray_user') ? project.property('bintray_user') : System.getenv('BINTRAY_USER')
+  key = project.hasProperty('bintray_key') ? project.property('bintray_key') : System.getenv('BINTRAY_KEY')
+  configurations = ['archives']
+  publications = ['mavenJava']
+  pkg {
+    repo = bintray_repo
+    name = project_name
+  }
+}
