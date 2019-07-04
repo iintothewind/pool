@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 public class LoadingPoolTest {
   @Test
   public void testPool() {
-    Pool<String> pool = LoadingPool
+    GenericPool<String> pool = SupplierPool
       .withSupplier(() -> {
         try {
           TimeUnit.SECONDS.sleep(1);

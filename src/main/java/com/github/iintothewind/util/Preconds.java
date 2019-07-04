@@ -2,7 +2,7 @@ package com.github.iintothewind.util;
 
 import java.util.Objects;
 
-public interface Preconditions {
+public interface Preconds {
   static void checkArg(final boolean expression, final Object msg) {
     if (!expression) {
       throw new IllegalArgumentException(String.valueOf(msg));

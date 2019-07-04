@@ -2,7 +2,7 @@ package com.github.iintothewind.pool;
 
 import java.util.concurrent.TimeUnit;
 
-public interface Pool<T> {
+public interface GenericPool<T> {
 
   T borrow();
 
